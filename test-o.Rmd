@@ -1,0 +1,24 @@
+---
+title: "chapple_RMD_training"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+y <- 3+3
+
+
+```
+
+ctrl + alt + i  for a new chunk
+play button runs all lines in chunk
+blue yarn at top is knitting to create final RMD doc
+
+
+```{r}
+
+```
+
