@@ -59,6 +59,86 @@ catch_clean <- catch_data %>%
   mutate(Chinook = as.integer(Chinook))
 ```
 
+```{r}
+catch_long <- catch_clean %>% 
+  pivot_longer(cols = -c(Region, Year), names_to = "species", values_to = "catch")
+```
+
+```{r}
+catch_wide <- catch_long %>% 
+  pivot_wider(names_from = Region, values_from = catch)
+```
+
+```{r}
+#catch_long <- catch_long %>% 
+  #rename(catch_thousands = catch)
+  #mutate(catch_thousands = catch_thousands * 1000)
+```
+
+```{r}
+mean_region <- catch_long %>% 
+  group_by(Region) %>% 
+  summarise(catch_mean = mean(catch))
+```
+
+```{r}
+
+region_defs <- read.csv("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.303.1") %>% 
+    select(code, mgmtArea)
+
+```
+
+```{r}
+catch_joined <- left_join(catch_long, region_defs, by = c("Region" = "code"))
+```
+
+```{r}
+region_defs <- region_defs %>% 
+  rename(Region = code, Region_Name = mgmtArea)
+```
+
+
+```{r}
+catch_joined <- left_join(catch_long, region_defs, by = c("Region"))
+
+head(catch_joined)
+```
+
+```{r}
+sites_df <- data.frame(site = c("HAW-101",
+                                "HAW-103",
+                                "OAH-320",
+                                "OAH-219",
+                                "MAI-039"))
+
+sites_df %>% 
+  separate(site, c("island", "site_number"), "-")
+```
+
+
+```{r}
+cities_df <- data.frame(city = c("Juneau AK", 
+                                 "Sitka AK", 
+                                 "Anchorage AK"))
+
+cities_df %>% 
+  separate(city, c("city", "state_code"), " ")
+```
+
+```{r}
+dates_df <- data.frame(year = c("1930",
+                                "1930",
+                                "1930"),
+                       month = c("12",
+                                "12",
+                                "12"),
+                       day = c("14",
+                               "15",
+                               "16"))
+
+dates_df %>% 
+  unite(date, year, month, day, sep = "-")
+```
 
 
 ## Join to Regions and Definitions

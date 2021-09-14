@@ -221,6 +221,74 @@ i</code></pre>
 <pre class="r"><code>catch_clean &lt;- catch_data %&gt;% 
   mutate(Chinook = if_else(Chinook == &quot;I&quot;, &quot;1&quot;, Chinook)) %&gt;% 
   mutate(Chinook = as.integer(Chinook))</code></pre>
+<pre class="r"><code>catch_long &lt;- catch_clean %&gt;% 
+  pivot_longer(cols = -c(Region, Year), names_to = &quot;species&quot;, values_to = &quot;catch&quot;)</code></pre>
+<pre class="r"><code>catch_wide &lt;- catch_long %&gt;% 
+  pivot_wider(names_from = Region, values_from = catch)</code></pre>
+<pre class="r"><code>#catch_long &lt;- catch_long %&gt;% 
+  #rename(catch_thousands = catch)
+  #mutate(catch_thousands = catch_thousands * 1000)</code></pre>
+<pre class="r"><code>mean_region &lt;- catch_long %&gt;% 
+  group_by(Region) %&gt;% 
+  summarise(catch_mean = mean(catch))</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<pre class="r"><code>region_defs &lt;- read.csv(&quot;https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.303.1&quot;) %&gt;% 
+    select(code, mgmtArea)</code></pre>
+<pre class="r"><code>catch_joined &lt;- left_join(catch_long, region_defs, by = c(&quot;Region&quot; = &quot;code&quot;))</code></pre>
+<pre class="r"><code>region_defs &lt;- region_defs %&gt;% 
+  rename(Region = code, Region_Name = mgmtArea)</code></pre>
+<pre class="r"><code>catch_joined &lt;- left_join(catch_long, region_defs, by = c(&quot;Region&quot;))
+
+head(catch_joined)</code></pre>
+<pre><code>## # A tibble: 6 × 5
+##   Region  Year species catch Region_Name              
+##   &lt;chr&gt;  &lt;int&gt; &lt;chr&gt;   &lt;int&gt; &lt;chr&gt;                    
+## 1 SSE     1886 Chinook     0 Southern Southeast Alaska
+## 2 SSE     1886 Sockeye     5 Southern Southeast Alaska
+## 3 SSE     1886 Coho        0 Southern Southeast Alaska
+## 4 SSE     1886 Pink        0 Southern Southeast Alaska
+## 5 SSE     1886 Chum        0 Southern Southeast Alaska
+## 6 SSE     1887 Chinook     0 Southern Southeast Alaska</code></pre>
+<pre class="r"><code>sites_df &lt;- data.frame(site = c(&quot;HAW-101&quot;,
+                                &quot;HAW-103&quot;,
+                                &quot;OAH-320&quot;,
+                                &quot;OAH-219&quot;,
+                                &quot;MAI-039&quot;))
+
+sites_df %&gt;% 
+  separate(site, c(&quot;island&quot;, &quot;site_number&quot;), &quot;-&quot;)</code></pre>
+<pre><code>##   island site_number
+## 1    HAW         101
+## 2    HAW         103
+## 3    OAH         320
+## 4    OAH         219
+## 5    MAI         039</code></pre>
+<pre class="r"><code>cities_df &lt;- data.frame(city = c(&quot;Juneau AK&quot;, 
+                                 &quot;Sitka AK&quot;, 
+                                 &quot;Anchorage AK&quot;))
+
+cities_df %&gt;% 
+  separate(city, c(&quot;city&quot;, &quot;state_code&quot;), &quot; &quot;)</code></pre>
+<pre><code>##        city state_code
+## 1    Juneau         AK
+## 2     Sitka         AK
+## 3 Anchorage         AK</code></pre>
+<pre class="r"><code>dates_df &lt;- data.frame(year = c(&quot;1930&quot;,
+                                &quot;1930&quot;,
+                                &quot;1930&quot;),
+                       month = c(&quot;12&quot;,
+                                &quot;12&quot;,
+                                &quot;12&quot;),
+                       day = c(&quot;14&quot;,
+                               &quot;15&quot;,
+                               &quot;16&quot;))
+
+dates_df %&gt;% 
+  unite(date, year, month, day, sep = &quot;-&quot;)</code></pre>
+<pre><code>##         date
+## 1 1930-12-14
+## 2 1930-12-15
+## 3 1930-12-16</code></pre>
 </div>
 <div id="join-to-regions-and-definitions" class="section level2">
 <h2>Join to Regions and Definitions</h2>
