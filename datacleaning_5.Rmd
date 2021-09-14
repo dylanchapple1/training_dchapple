@@ -1,0 +1,64 @@
+---
+title: "datacleaning_5"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+crtl/alt/i is the keyboard shortcut for a new chunk
+
+``` {r librarycalls, message = FALSE}
+library(dplyr)
+library(tidyr)
+library(readr)
+```
+
+## Data Sources
+
+Read in the data from [KNB] https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1" 
+
+```{r}
+catch_original <- read.csv("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1")
+
+glimpse(catch_original)
+```
+
+## Clean and Reshape Data
+
+*remove unnecessary columns
+*check column types
+*reshape data
+
+```{r}
+catch_data <- catch_original %>% 
+  # select(Region, Year, Chinook, Sockeye, Coho, Pink, Chum)
+  select(-All, -notesRegCode)
+
+glimpse(catch_data)
+
+```
+
+```{r}
+catch_clean <- catch_data %>% 
+  mutate(Chinook = as.integer(Chinook))
+```
+ error, 1 chinook was coerced into n/a--code below detects where the issue is
+
+```{r}
+i <- which(is.na(catch_clean$Chinook))
+i
+```
+
+Fixing it: First, replacing the I with 1, then, changing case type to integer
+
+```{r}
+catch_clean <- catch_data %>% 
+  mutate(Chinook = if_else(Chinook == "I", "1", Chinook)) %>% 
+  mutate(Chinook = as.integer(Chinook))
+```
+
+
+
+## Join to Regions and Definitions
